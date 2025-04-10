@@ -1,5 +1,5 @@
-import loja
-import carrinho
+from loja import Loja
+from carrinho import Carrinho
 
 def exibir_menu():
     print("\n== MENU LOJA VIRTUAL ==")
