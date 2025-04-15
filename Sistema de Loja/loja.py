@@ -1,11 +1,12 @@
 class Loja:
     def __init__(self):
-        from produto import Produto  # para evitar import circular se for usado no main
+        from produto import Produto  
         self.produtos = [
             Produto("Notebook", 2800.00, 5),
             Produto("Mouse", 38.55, 10),
             Produto("Teclado", 85.48, 8),
-            Produto("Monitor", 850.89, 4)
+            Produto("Monitor", 850.89, 4),
+            Produto("Carregador", 35.60, 15)
         ]
 
     def exibir_produtos(self):
@@ -19,41 +20,40 @@ class Loja:
         else:
             return None
 
-    def aplicar_desconto_produto(self, indice, percentual):
-        produto = self.encontrar_produto(indice)
-        if produto:
-            produto.aplicar_desconto(percentual)
-            print(f"Desconto de {percentual}% aplicado ao produto {produto.nome}.")
-        else:
-            print("Produto não encontrado.")
-
     def processar_pagamento(self, total):
-        print("\nFormas de Pagamento:")
-        print("[1] Dinheiro/Pix (10% de desconto)")
-        print("[2] Cartão à vista (5% de desconto)")
-        print("[3] Cartão parcelado (20% de acréscimo)")
+        print(f"\n[ Preço das compras: R${total:.2f} ]")
+        print("\n== Formas de Pagamento: ==")
+        print("[1] à vista dinheiro/cheque (10% de desconto)")
+        print("[2] à vista cartão (5% de desconto)")
+        print("[3] 2x no cartão")
+        print("[4] 3x ou mais no cartão (+20% de juros)")
 
-        opcao = input("Escolha a opção de pagamento: ")
-
-        if opcao == "1":
-            total *= 0.90
-            print("Pagamento à vista com 10% de desconto.")
-        elif opcao == "2":
-            total *= 0.95
-            print("Pagamento no cartão com 5% de desconto.")
-        elif opcao == "3":
-            total *= 1.20
-            print("Pagamento parcelado com 20% de juros.")
-        else:
-            print("Opção inválida. Considerando valor total sem desconto/juros.")
-
-        print(f"Total a pagar: R${total:.2f}")
-        valor_pago = float(input("Digite o valor pago: R$"))
-
-        if valor_pago >= total:
-            troco = valor_pago - total
-            print(f"Pagamento aprovado. Troco: R${troco:.2f}")
-            return True
-        else:
-            print("Valor insuficiente. Pagamento não concluído.")
+        try:
+            opcao = int(input('\n\tQual é a opção? '))
+        except ValueError:
+            print("Opção inválida. Pagamento cancelado.")
             return False
+
+        if opcao == 1:
+            total *= 0.90
+        elif opcao == 2:
+            total *= 0.95
+        elif opcao == 3:
+            parcela = total / 2
+            print(f'\nSua compra será parcelada em 2x de R${parcela:.2f} SEM JUROS')
+        elif opcao == 4:
+            total *= 1.20
+            try:
+                totalParcela = int(input('Quantas Parcelas? '))
+                parcela = total / totalParcela
+                print(f'\nSua compra será parcelada em {totalParcela}x de R${parcela:.2f} COM JUROS')
+            except ValueError:
+                print("\nNúmero de parcelas inválido.")
+                return False
+        else:
+            print('Opção inválida. Tente novamente.')
+            return False
+        print(f"\n Total a pagar: R${total:.2f}")
+        print("Compra finalizada com sucesso!\n")  
+        return True
+        
