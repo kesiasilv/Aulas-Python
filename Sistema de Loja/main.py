@@ -1,74 +1,84 @@
+import os
 from loja import Loja
 from carrinho import Carrinho
 
-def exibir_menu():
-    print("\n== MENU LOJA VIRTUAL ==")
+def limpar_tela():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+loja = Loja()
+carrinho = Carrinho()
+
+while True:
+    limpar_tela()
+    print("== MENU LOJA VIRTUAL ==")
     print("1. Listar produtos")
     print("2. Adicionar produto ao carrinho")
     print("3. Remover produto do carrinho")
     print("4. Visualizar carrinho")
-    print("5. Aplicar desconto a um produto")
-    print("6. Finalizar compra")
-    print("7. Sair")
+    print("5. Finalizar compra")
+    print("6. Sair")
 
-def main():
-    loja = Loja()
-    carrinho = Carrinho()
-    executando = True
+    opcao = input("Escolha uma opção: ")
 
-    while executando:
-        exibir_menu()
-        opcao = input("Escolha uma opção: ")
+    if opcao == "1":
+        limpar_tela()
+        loja.exibir_produtos()
+        input("\nPressione Enter para voltar ao menu...")
 
-        if opcao == "1":
-            loja.exibir_produtos()
-
-        elif opcao == "2":
-            loja.exibir_produtos()
-            try:
-                indice = int(input("Digite o número do produto: "))
+    elif opcao == "2":
+        limpar_tela()
+        loja.exibir_produtos()
+        try:
+            indice = int(input("Digite o número do produto: "))
+            produto = loja.encontrar_produto(indice)
+            if produto:
                 quantidade = int(input("Digite a quantidade: "))
-                produto = loja.encontrar_produto(indice)
-                if produto:
+                if quantidade <= produto.estoque:
                     carrinho.adicionar(produto, quantidade)
+                    produto.estoque -= quantidade
+                    print(f"{quantidade}x {produto.nome} adicionado ao carrinho.")
                 else:
-                    print("Produto não encontrado.")
-            except ValueError:
-                print("Entrada inválida.")
-
-        elif opcao == "3":
-            carrinho.exibir_itens()
-            nome = input("Digite o nome do produto para remover: ")
-            carrinho.remover(nome)
-
-        elif opcao == "4":
-            carrinho.exibir_itens()
-
-        elif opcao == "5":
-            loja.exibir_produtos()
-            try:
-                indice = int(input("Digite o número do produto para aplicar desconto: "))
-                percentual = float(input("Digite o percentual de desconto (%): "))
-                loja.aplicar_desconto_produto(indice, percentual)
-            except ValueError:
-                print("Entrada inválida.")
-
-        elif opcao == "6":
-            carrinho.exibir_itens()
-            total = carrinho.calcular_total()
-            if total > 0:
-                sucesso = loja.processar_pagamento(total)
-                if sucesso:
-                    carrinho.esvaziar()
+                    print("Quantidade indisponível no estoque.")
             else:
-                print("Carrinho vazio.")
+                print("Produto não encontrado.")
+        except ValueError:
+            print("Entrada inválida.")
+        input("\nPressione Enter para voltar ao menu...")
 
-        elif opcao == "7":
-            executando = False
-            print("Saindo da loja. Até mais!")
+    elif opcao == "3":
+        limpar_tela()
+        carrinho.exibir_itens()
+        try:
+            nome = input("Digite o nome do produto que deseja remover: ")
+            carrinho.remover(nome)
+        except Exception as e:
+            print("Erro:", e)
+        input("\nPressione Enter para voltar ao menu...")
 
+    elif opcao == "4":
+        limpar_tela()
+        carrinho.exibir_itens()
+        input("\nPressione Enter para voltar ao menu...")
+
+    elif opcao == "5":
+        limpar_tela()
+        carrinho.exibir_itens()
+        total = carrinho.calcular_total()
+        if total == 0:
+            print("Carrinho vazio. Adicione itens antes de finalizar a compra.")
         else:
-            print("Opção inválida. Tente novamente.")
+            if loja.processar_pagamento(total):
+                carrinho.itens.clear()
+                print("\n---------------------")
+                print("| Carrinho esvaziado.|")
+        input("\nPressione Enter para voltar ao menu...")
 
-if __name__ == "__main__":
-    main()
+    elif opcao == "6":
+        print("Saindo da loja... Volte sempre!")
+        break
+
+    else:
+        print("Opção inválida.")
+        input("\nPressione Enter para voltar ao menu...")
+
+
